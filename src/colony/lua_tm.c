@@ -649,9 +649,7 @@ static int l_tm_buffer_fill (lua_State *L)
   int start = (int) lua_tonumber(L, 3);
   int end = (int) lua_tonumber(L, 4);
 
-  for (int i = start; i < end; i++) {
-    a[i] = value;
-  }
+  memset(a + start, value, end - start);
   return 0;
 }
 
@@ -663,9 +661,7 @@ static int l_tm_buffer_copy (lua_State *L)
   int sourceStart = (int) lua_tonumber(L, 4);
   int sourceEnd = (int) lua_tonumber(L, 5);
 
-  for (int i = 0; i < sourceEnd - sourceStart; i++) {
-    target[targetStart + i] = source[sourceStart + i];
-  }
+  memmove(target + targetStart, source + sourceStart, sourceEnd - sourceStart);
   return 0;
 }
 
