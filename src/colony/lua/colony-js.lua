@@ -1614,13 +1614,28 @@ date_proto.setYear = function (this, year)
   end
 end
 
-date_proto.setFullYear = function () end
-date_proto.setMonth = function () end
-date_proto.setDate = function () end
+date_proto.setFullYear = function (this, year)
+  ms = getmetatable(this).date % 1e6
+  t = os.date('*t', getmetatable(this).date / 1e6)
+  t.year = year
+  getmetatable(this).date = (os.time(t) * 1e6) + ms
+end
+date_proto.setMonth = function (this, month)
+  ms = getmetatable(this).date % 1e6
+  t = os.date('*t', getmetatable(this).date / 1e6)
+  t.month = month + 1
+  getmetatable(this).date = (os.time(t) * 1e6) + ms
+end
+date_proto.setDate = function (this, date)
+  ms = getmetatable(this).date % 1e6
+  t = os.date('*t', getmetatable(this).date / 1e6)
+  t.day = date
+  getmetatable(this).date = (os.time(t) * 1e6) + ms
+end
 
-date_proto.setUTCFullYear = function () end
-date_proto.setUTCMonth = function () end
-date_proto.setUTCDate = function () end
+date_proto.setUTCFullYear = date_proto.setFullYear
+date_proto.setUTCMonth = date_proto.setMonth
+date_proto.setUTCDate = date_proto.setDate
 
 date_proto.toDateString = function () return ''; end
 date_proto.toGMTString = function () return ''; end
