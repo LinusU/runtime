@@ -1,6 +1,6 @@
 var tap = require('../tap');
 
-tap.count(39);
+tap.count(40);
 
 var d = new Date();
 var offset = d.getTimezoneOffset() * 60000;
@@ -123,3 +123,5 @@ tap.eq(d.getUTCMinutes(), (35 + offsetMinutes) % 60);
 d = new Date();
 d.setUTCMinutes(35);
 tap.eq(d.getMinutes(), (35 - offsetMinutes) % 60);
+
+tap.eq(Date.UTC(1992, 11, 2, 16, 17), 723313020000);
