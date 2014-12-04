@@ -1,6 +1,6 @@
 var tap = require('../tap');
 
-tap.count(28);
+tap.count(35);
 
 var d;
 
@@ -77,3 +77,20 @@ tap.eq(16, d.getHours());
 tap.eq(17, d.getMinutes());
 tap.eq(18, d.getSeconds());
 tap.eq(19, d.getMilliseconds());
+
+/** FORMAT **/
+
+d = new Date(1992, 11, 2, 16, 0, 0);
+
+function testEqFixTimezoneName (a, b) {
+  tap.eq(a.replace(' (UTC)', ' (GMT)'), b);
+}
+
+tap.eq(d.toDateString(), 'Wed Dec 02 1992');
+tap.eq(d.toLocaleDateString(), 'Wednesday, December 02, 1992');
+tap.eq(d.toLocaleTimeString(), '16:00:00');
+tap.eq(d.toUTCString(), 'Wed, 02 Dec 1992 16:00:00 GMT');
+tap.eq(d.toGMTString(), 'Wed, 02 Dec 1992 16:00:00 GMT');
+
+testEqFixTimezoneName(d.toLocaleString(), 'Wed Dec 02 1992 16:00:00 GMT+0000 (GMT)');
+testEqFixTimezoneName(d.toTimeString(), '16:00:00 GMT+0000 (GMT)');

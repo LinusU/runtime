@@ -1664,16 +1664,26 @@ date_proto.setUTCFullYear = date_proto.setFullYear
 date_proto.setUTCMonth = date_proto.setMonth
 date_proto.setUTCDate = date_proto.setDate
 
-date_proto.toDateString = function () return ''; end
-date_proto.toGMTString = function () return ''; end
-date_proto.toLocaleDateString = function () return ''; end
-date_proto.toLocaleString = function () return ''; end
-date_proto.toLocaleTimeString = function () return ''; end
-date_proto.toTimeString = function () return ''; end
-
-date_proto.toUTCString = function ()
-  return os.date('!%a, %d %h %Y %H:%M:%S GMT', getmetatable(this).date/1e6)
+date_proto.toDateString = function (this)
+  return os.date('!%a %b %d %Y', getmetatable(this).date / 1e6)
 end
+date_proto.toLocaleDateString = function (this)
+  return os.date('%A, %B %d, %Y', getmetatable(this).date / 1e6)
+end
+date_proto.toLocaleString = function (this)
+  return os.date('%a %b %d %Y %H:%M:%S GMT%z (%Z)', getmetatable(this).date / 1e6)
+end
+date_proto.toLocaleTimeString = function (this)
+  return os.date('%H:%M:%S', getmetatable(this).date / 1e6)
+end
+date_proto.toUTCString = function (this)
+  return os.date('!%a, %d %h %Y %H:%M:%S GMT', getmetatable(this).date / 1e6)
+end
+date_proto.toTimeString = function (this)
+  return os.date('!%H:%M:%S GMT%z (%Z)', getmetatable(this).date / 1e6)
+end
+
+date_proto.toGMTString = date_proto.toUTCString
 
 global.Date.now = function ()
   return math.floor(tonumber(tm.timestamp()/1e3)) or 0
