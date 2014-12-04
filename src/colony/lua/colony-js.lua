@@ -1565,7 +1565,9 @@ date_proto.getHours = function (this)
 end
 
 date_proto.getMilliseconds = function (this)
-  return math.floor((getmetatable(this).date/1e3)%1e3)
+  -- https://github.com/tessel/runtime/issues/677
+  local wrongValue = math.floor(getmetatable(this).date / 1e3) % 1e3
+  return (2e3 + wrongValue) % 1e3
 end
 
 date_proto.getMinutes = function (this)
@@ -1585,7 +1587,10 @@ date_proto.getTime = function (this)
 end
 
 date_proto.getTimezoneOffset = function ()
-  return 0
+  local z = os.date('%z', getmetatable(this).date / 1e6)
+  local min = tonumber(string.sub(z, 4, 5), 10)
+  local hour = tonumber(string.sub(z, 1, 3), 10)
+  return 0 - (hour * 60 + min)
 end
 
 date_proto.getUTCDate = date_proto.getDate
@@ -1612,25 +1617,40 @@ date_proto.setTime = function (this, time)
 end
 
 date_proto.setHours = function (this, hours)
-  t = getmetatable(this).date
-  getmetatable(this).date = t - (t % 86400e6) + (hours * 3600e6) + (t % 3600e6)
+  ms = getmetatable(this).date % 1e6
+  t = os.date('*t', getmetatable(this).date / 1e6)
+  t.hour = hours
+  getmetatable(this).date = (os.time(t) * 1e6) + ms
 end
 date_proto.setMinutes = function (this, minutes)
-  t = getmetatable(this).date
-  getmetatable(this).date = t - (t % 3600e6) + (minutes * 60e6) + (t % 60e6)
+  ms = getmetatable(this).date % 1e6
+  t = os.date('*t', getmetatable(this).date / 1e6)
+  t.min = minutes
+  getmetatable(this).date = (os.time(t) * 1e6) + ms
 end
 date_proto.setSeconds = function (this, seconds)
-  t = getmetatable(this).date
-  getmetatable(this).date = t - (t % 60e6) + (seconds * 1e6) + (t % 1e6)
+  ms = getmetatable(this).date % 1e6
+  t = os.date('*t', getmetatable(this).date / 1e6)
+  t.sec = seconds
+  getmetatable(this).date = (os.time(t) * 1e6) + ms
 end
 date_proto.setMilliseconds = function (this, ms)
   t = getmetatable(this).date
   getmetatable(this).date = t - (t % 1e6) + (minutes * 1e3) + (t % 1e3)
 end
 
-date_proto.setUTCHours = date_proto.setHours
-date_proto.setUTCMinutes = date_proto.setMinutes
-date_proto.setUTCSeconds = date_proto.setSeconds
+date_proto.setUTCHours = function (this, hours)
+  t = getmetatable(this).date
+  getmetatable(this).date = t - (t % 86400e6) + (hours * 3600e6) + (t % 3600e6)
+end
+date_proto.setUTCMinutes = function (this, minutes)
+  t = getmetatable(this).date
+  getmetatable(this).date = t - (t % 3600e6) + (minutes * 60e6) + (t % 60e6)
+end
+date_proto.setUTCSeconds = function (this, seconds)
+  t = getmetatable(this).date
+  getmetatable(this).date = t - (t % 60e6) + (seconds * 1e6) + (t % 1e6)
+end
 date_proto.setUTCMilliseconds = date_proto.setMilliseconds
 
 date_proto.setYear = function (this, year)
@@ -1665,7 +1685,7 @@ date_proto.setUTCMonth = date_proto.setMonth
 date_proto.setUTCDate = date_proto.setDate
 
 date_proto.toDateString = function (this)
-  return os.date('!%a %b %d %Y', getmetatable(this).date / 1e6)
+  return os.date('%a %b %d %Y', getmetatable(this).date / 1e6)
 end
 date_proto.toLocaleDateString = function (this)
   return os.date('%A, %B %d, %Y', getmetatable(this).date / 1e6)
@@ -1680,7 +1700,7 @@ date_proto.toUTCString = function (this)
   return os.date('!%a, %d %h %Y %H:%M:%S GMT', getmetatable(this).date / 1e6)
 end
 date_proto.toTimeString = function (this)
-  return os.date('!%H:%M:%S GMT%z (%Z)', getmetatable(this).date / 1e6)
+  return os.date('%H:%M:%S GMT%z (%Z)', getmetatable(this).date / 1e6)
 end
 
 date_proto.toGMTString = date_proto.toUTCString

@@ -2,7 +2,8 @@ var tap = require('../tap');
 
 tap.count(35);
 
-var d;
+var d = new Date();
+var offset = d.getTimezoneOffset() * 60000;
 
 /** TIME **/
 
@@ -27,7 +28,7 @@ tap.eq(20, d.getSeconds());
 tap.eq(8, d.getHours());
 
 d = new Date();
-d.setTime(35);
+d.setTime(35 + offset);
 tap.eq(1970, d.getFullYear());
 tap.eq(35, d.getMilliseconds());
 
@@ -80,17 +81,23 @@ tap.eq(19, d.getMilliseconds());
 
 /** FORMAT **/
 
-d = new Date(1992, 11, 2, 16, 0, 0);
-
-function testEqFixTimezoneName (a, b) {
-  tap.eq(a.replace(' (UTC)', ' (GMT)'), b);
+function testEqIgnoreTimezoneName (a, b) {
+  var re = / GMT[-+][0-9]{4} \([^)]+\)$/;
+  tap.eq(a.replace(re, '...'), b.replace(re, '...'));
 }
 
-tap.eq(d.toDateString(), 'Wed Dec 02 1992');
-tap.eq(d.toLocaleDateString(), 'Wednesday, December 02, 1992');
-tap.eq(d.toLocaleTimeString(), '16:00:00');
+// 1992-12-02 UTC
+d = new Date(723312000000);
+
 tap.eq(d.toUTCString(), 'Wed, 02 Dec 1992 16:00:00 GMT');
 tap.eq(d.toGMTString(), 'Wed, 02 Dec 1992 16:00:00 GMT');
 
-testEqFixTimezoneName(d.toLocaleString(), 'Wed Dec 02 1992 16:00:00 GMT+0000 (GMT)');
-testEqFixTimezoneName(d.toTimeString(), '16:00:00 GMT+0000 (GMT)');
+// 1992-12-02 Local
+d = new Date(1992, 11, 2, 16, 0, 0);
+
+tap.eq(d.toDateString(), 'Wed Dec 02 1992');
+testEqIgnoreTimezoneName(d.toTimeString(), '16:00:00 GMT+0000 (GMT)');
+
+tap.eq(d.toLocaleDateString(), 'Wednesday, December 02, 1992');
+tap.eq(d.toLocaleTimeString(), '16:00:00');
+testEqIgnoreTimezoneName(d.toLocaleString(), 'Wed Dec 02 1992 16:00:00 GMT+0000 (GMT)');
