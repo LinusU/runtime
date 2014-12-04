@@ -1580,25 +1580,47 @@ end
 date_proto.toJSON = date_proto.toISOString
 date_proto.valueOf = date_proto.getTime
 
-date_proto.setDate = function () end
-date_proto.setFullYear = function () end
-date_proto.setHours = function () end
-date_proto.setMilliseconds = function () end
-date_proto.setMinutes = function () end
-date_proto.setMonth = function () end
-date_proto.setSeconds = function () end
-date_proto.setTime = function () end
-date_proto.setUTCDate = function () end
-date_proto.setUTCFullYear = function () end
-date_proto.setUTCHours = function () end
-date_proto.setUTCMinutes = function () end
-date_proto.setUTCMonth = function () end
-date_proto.setUTCSeconds = function () end
-date_proto.setYear = function () end
-
-date_proto.setUTCMilliseconds = function (this, sec)
-  getmetatable(this).date = getmetatable(this).date + (sec*1000)
+date_proto.setTime = function (this, time)
+  getmetatable(this).date = time * 1e3
 end
+
+date_proto.setHours = function (this, hours)
+  t = getmetatable(this).date
+  getmetatable(this).date = t - (t % 86400e6) + (hours * 3600e6) + (t % 3600e6)
+end
+date_proto.setMinutes = function (this, minutes)
+  t = getmetatable(this).date
+  getmetatable(this).date = t - (t % 3600e6) + (minutes * 60e6) + (t % 60e6)
+end
+date_proto.setSeconds = function (this, seconds)
+  t = getmetatable(this).date
+  getmetatable(this).date = t - (t % 60e6) + (seconds * 1e6) + (t % 1e6)
+end
+date_proto.setMilliseconds = function (this, ms)
+  t = getmetatable(this).date
+  getmetatable(this).date = t - (t % 1e6) + (minutes * 1e3) + (t % 1e3)
+end
+
+date_proto.setUTCHours = date_proto.setHours
+date_proto.setUTCMinutes = date_proto.setMinutes
+date_proto.setUTCSeconds = date_proto.setSeconds
+date_proto.setUTCMilliseconds = date_proto.setMilliseconds
+
+date_proto.setYear = function (this, year)
+  if year >= 0 and year <= 99 then
+    date_proto.setFullYear(this, 1900 + year)
+  else
+    date_proto.setFullYear(this, year)
+  end
+end
+
+date_proto.setFullYear = function () end
+date_proto.setMonth = function () end
+date_proto.setDate = function () end
+
+date_proto.setUTCFullYear = function () end
+date_proto.setUTCMonth = function () end
+date_proto.setUTCDate = function () end
 
 date_proto.toDateString = function () return ''; end
 date_proto.toGMTString = function () return ''; end
