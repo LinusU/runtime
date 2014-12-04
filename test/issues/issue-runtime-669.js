@@ -5,7 +5,7 @@ tap.count(39);
 var d = new Date();
 var offset = d.getTimezoneOffset() * 60000;
 var offsetMinutes = (offset / 60000 % 60);
-var offsetHours = (offset / 3600000 % 24) - (offsetMinutes / 60);
+var offsetHours = (offset / 3600000 % 24);
 
 /** TIME **/
 
@@ -108,11 +108,13 @@ testEqIgnoreTimezoneName(d.toLocaleString(), 'Wed Dec 02 1992 16:00:00 GMT+0000 
 
 d = new Date();
 d.setHours(16);
-tap.eq(d.getUTCHours(), (16 + offsetHours) % 24);
+d.setMinutes(0);
+tap.eq(d.getUTCHours(), Math.floor(16 + offsetHours) % 24);
 
 d = new Date();
 d.setUTCHours(16);
-tap.eq(d.getHours(), (16 - offsetHours) % 24);
+d.setUTCMinutes(0);
+tap.eq(d.getHours(), Math.floor(16 - offsetHours) % 24);
 
 d = new Date();
 d.setMinutes(35);
