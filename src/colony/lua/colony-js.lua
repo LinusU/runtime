@@ -1589,17 +1589,40 @@ end
 date_proto.getTimezoneOffset = function ()
   local z = os.date('%z', getmetatable(this).date / 1e6)
   local min = tonumber(string.sub(z, 4, 5), 10)
-  local hour = tonumber(string.sub(z, 1, 3), 10)
-  return 0 - (hour * 60 + min)
+  local hour = tonumber(string.sub(z, 2, 3), 10)
+  local sign = tonumber(string.sub(z, 1, 1) .. '1', 10)
+  return 0 - (hour * 60 + min) * sign
 end
 
-date_proto.getUTCDate = date_proto.getDate
-date_proto.getUTCDay = date_proto.getDay
-date_proto.getUTCFullYear = date_proto.getFullYear
-date_proto.getUTCHours = date_proto.getHours
+date_proto.getUTCDate = function (this)
+  return os.date('!*t', getmetatable(this).date/1e6).day
+end
+
+date_proto.getUTCDay = function (this)
+  return os.date('!*t', getmetatable(this).date/1e6).wday - 1
+end
+
+date_proto.getUTCFullYear = function (this)
+  return os.date('!*t', getmetatable(this).date/1e6).year
+end
+
+date_proto.getUTCHours = function (this)
+  return os.date('!*t', getmetatable(this).date/1e6).hour
+end
+
 date_proto.getUTCMilliseconds = date_proto.getMilliseconds
-date_proto.getUTCMinutes = date_proto.getMinutes
-date_proto.getUTCSeconds = date_proto.getSeconds
+
+date_proto.getUTCMinutes = function (this)
+  return os.date('!*t', getmetatable(this).date/1e6).min
+end
+
+date_proto.getUTCMonth = function (this)
+  return os.date('!*t', getmetatable(this).date/1e6).month - 1
+end
+
+date_proto.getUTCSeconds = function (this)
+  return os.date('!*t', getmetatable(this).date/1e6).sec
+end
 
 date_proto.getYear = function (this)
   return os.date('*t', getmetatable(this).date/1e6).year - 1900
