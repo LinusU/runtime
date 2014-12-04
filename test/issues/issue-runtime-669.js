@@ -1,6 +1,6 @@
 var tap = require('../tap');
 
-tap.count(20);
+tap.count(28);
 
 var d;
 
@@ -65,3 +65,15 @@ d.setMinutes(36);
 d.setMonth(4);
 tap.eq(36, d.getMinutes());
 tap.eq(4, d.getMonth());
+
+/** NEW **/
+
+d = new Date(1992, 11, 2, 16, 17, 18, 19);
+tap.eq(1992, d.getFullYear());
+tap.eq(92, d.getYear());
+tap.eq(11, d.getMonth());
+tap.eq(2, d.getDate());
+tap.eq(16, d.getHours());
+tap.eq(17, d.getMinutes());
+tap.eq(18, d.getSeconds());
+tap.eq(19, d.getMilliseconds());

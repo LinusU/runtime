@@ -1494,24 +1494,51 @@ end
 
 -- Date
 
-global.Date = function (this, time)
-  if not js_instanceof(this, global.Date) then
-    return os.date('!%a %h %d %Y %H:%M:%S GMT%z (%Z)')
-  end
-  if type(time) == 'number' then
-    getmetatable(this).date = time*1000
+global.Date = function (this, ...)
 
-  -- temporary hardcode for ntp-client
-  elseif time == 'Jan 01 1900 GMT' then
-    getmetatable(this).date = -2208988800000000
+  local dateValue
+  local arg = table.pack(...)
 
-  elseif type(time) == 'string' then
-    getmetatable(this).date = tm.approxidate_milli(time)*1000
+  if #arg > 1 then
+
+    local info = {}
+
+    info['year'] = arg[1]
+    info['month'] = arg[2] + 1
+    info['day'] = (#arg > 2 and arg[3] or 1)
+    info['hour'] = (#arg > 3 and arg[4] or 0)
+    info['min'] = (#arg > 4 and arg[5] or 0)
+    info['sec'] = (#arg > 5 and arg[6] or 0)
+    local ms = (#arg > 6 and arg[7] or 0)
+
+    dateValue = (os.time(info) * 1e6) + (ms * 1e3)
 
   else
-    getmetatable(this).date = tm.timestamp()
+
+    local time = arg[1]
+
+    if type(time) == 'number' then
+      dateValue = time*1000
+
+    -- temporary hardcode for ntp-client
+    elseif time == 'Jan 01 1900 GMT' then
+      dateValue = -2208988800000000
+
+    elseif type(time) == 'string' then
+      dateValue = tm.approxidate_milli(time)*1000
+
+    else
+      dateValue = tm.timestamp()
+    end
+
   end
-  return this
+
+  if js_instanceof(this, global.Date) then
+    getmetatable(this).date = dateValue
+    return this
+  else
+    return os.date('!%a %h %d %Y %H:%M:%S GMT%z (%Z)', dateValue / 1e6)
+  end
 end
 
 global.Date.prototype = date_proto
